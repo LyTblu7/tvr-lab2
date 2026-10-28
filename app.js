@@ -121,8 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-  // ── 5. ПОЧАТКОВИЙ ЗАПУСК ────────────────────────────────────────────────
-  srcText.value = 'Доброго дня! Це перевірка онлайн-перекладача.';
-  performTranslation();
+  // ── 5. ПОЧАТКОВИЙ СТАН ──────────────────────────────────────────────────
+  srcText.value = '';
+  tgtText.value = '';
+  srcText.focus();
 
 });
