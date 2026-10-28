@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Онлайн-перекладач | ЛБ2 ТВР (Варіант 16)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Онлайн-перекладач тексту</h1>
+      <p>Лабораторна робота №2 • Варіант 16 • Студент: Чекавий Р. С. (КІУКІ-23-7)</p>
+    </header>
+
+    <main>
+      <!-- Панель вибору мов -->
+      <div class="lang-controls">
+        <div class="control-group">
+          <label for="src-lang">З мови:</label>
+          <select id="src-lang">
+            <option value="uk" selected>Українська</option>
+            <option value="en">Англійська</option>
+            <option value="de">Німецька</option>
+            <option value="fr">Французька</option>
+            <option value="es">Іспанська</option>
+            <option value="pl">Польська</option>
+          </select>
+        </div>
+
+        <button type="button" id="btn-swap" title="Поміняти мови місцями">⇄ Поміняти місцями</button>
+
+        <div class="control-group">
+          <label for="tgt-lang">На мову:</label>
+          <select id="tgt-lang">
+            <option value="uk">Українська</option>
+            <option value="en" selected>Англійська</option>
+            <option value="de">Німецька</option>
+            <option value="fr">Французька</option>
+            <option value="es">Іспанська</option>
+            <option value="pl">Польська</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Текстові поля -->
+      <div class="text-boxes">
+        <div class="box">
+          <label for="src-text">Вхідний текст:</label>
+          <textarea id="src-text" placeholder="Введіть текст для перекладу..." rows="6"></textarea>
+        </div>
+
+        <div class="box">
+          <label for="tgt-text">Результат перекладу:</label>
+          <textarea id="tgt-text" readonly placeholder="Тут буде переклад..." rows="6"></textarea>
+        </div>
+      </div>
+
+      <!-- Кнопки та налаштування -->
+      <div class="actions">
+        <button type="button" id="btn-translate">Перекласти</button>
+        
+        <label class="checkbox-label">
+          <input type="checkbox" id="chk-auto" checked>
+          Автопереклад під час набору (RxJS debounce 500 мс)
+        </label>
+      </div>
+
+      <!-- Статус / помилки -->
+      <div id="status-box" class="status-box">Готовий до роботи</div>
+    </main>
+
+    <footer>
+      <p>ХНУРЕ, кафедра АПОТ, дисципліна «Технології веб-розробки»</p>
+    </footer>
+  </div>
+
+  <!-- RxJS 7 з CDN (з резервною локальною копією) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/7.8.1/rxjs.umd.min.js"></script>
+  <script>
+    if (!window.rxjs) {
+      document.write('<script src="../vendor/rxjs.umd.min.js"><\/script>');
+    }
+  </script>
+
+  <script src="app.js"></script>
+</body>
+</html>

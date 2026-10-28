@@ -1,0 +1,209 @@
+/* styles.css — Прості базові стилі без анімацій та ускладнень (ЛБ2 ТВР, Варіант 16) */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f4f6f8;
+  color: #333333;
+  line-height: 1.4;
+  padding: 20px;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  padding: 24px;
+}
+
+header {
+  border-bottom: 2px solid #205493;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  font-size: 22px;
+  color: #205493;
+  margin-bottom: 4px;
+}
+
+header p {
+  font-size: 13px;
+  color: #666666;
+}
+
+/* Панель мов */
+.lang-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.control-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #444444;
+}
+
+select {
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+#btn-swap {
+  padding: 8px 14px;
+  font-size: 13px;
+  border: 1px solid #cccccc;
+  background: #e9ecef;
+  color: #333333;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#btn-swap:hover {
+  background: #dee2e6;
+}
+
+/* Текстові поля */
+.text-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 140px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #205493;
+}
+
+#tgt-text {
+  background-color: #f8f9fa;
+  color: #222222;
+}
+
+/* Кнопки та дії */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+#btn-translate {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  background: #205493;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#btn-translate:hover {
+  background: #112e51;
+}
+
+#btn-translate:disabled {
+  background: #999999;
+  cursor: not-allowed;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Статус */
+.status-box {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+  background: #e9ecef;
+  color: #495057;
+  border-left: 4px solid #6c757d;
+}
+
+.status-box.loading {
+  background: #cce5ff;
+  color: #004085;
+  border-left-color: #004085;
+}
+
+.status-box.success {
+  background: #d4edda;
+  color: #155724;
+  border-left-color: #28a745;
+}
+
+.status-box.error {
+  background: #f8d7da;
+  color: #721c24;
+  border-left-color: #dc3545;
+}
+
+footer {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeee;
+  text-align: center;
+  font-size: 12px;
+  color: #777777;
+}
+
+/* Адаптивність */
+@media (max-width: 600px) {
+  .lang-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .text-boxes {
+    grid-template-columns: 1fr;
+  }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
