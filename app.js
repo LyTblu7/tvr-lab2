@@ -1,129 +1,89 @@
-/**
- * app.js — Логіка взаємодії з інтерфейсом та API перекладу
- * Стек: Pure JavaScript ES6+, Fetch API, RxJS 7
- */
+const { fromEvent, merge } = rxjs;
+const { debounceTime, map, switchMap } = rxjs.operators;
 
-document.addEventListener('DOMContentLoaded', () => {
+const sourceLang = document.getElementById('source-lang');
+const targetLang = document.getElementById('target-lang');
+const sourceText = document.getElementById('source-text');
+const targetText = document.getElementById('target-text');
+const translateBtn = document.getElementById('translate-btn');
+const swapBtn = document.getElementById('swap-btn');
+const statusEl = document.getElementById('status');
 
-  // ── 1. ЕЛЕМЕНТИ ІНТЕРФЕЙСУ ──────────────────────────────────────────────
-  const srcLang   = document.getElementById('src-lang');
-  const tgtLang   = document.getElementById('tgt-lang');
-  const btnSwap   = document.getElementById('btn-swap');
-  const srcText   = document.getElementById('src-text');
-  const tgtText   = document.getElementById('tgt-text');
-  const btnTrans  = document.getElementById('btn-translate');
-  const chkAuto   = document.getElementById('chk-auto');
-  const statusBox = document.getElementById('status-box');
+async function translate(text, from, to) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
+  const response = await fetch(url);
 
-
-  // ── 2. АСИНХРОННИЙ ЗАПИТ ДО API ПЕРЕКЛАДУ (FETCH + ASYNC/AWAIT) ──────────
-  async function fetchTranslation(text, from, to) {
-    const query = (text || '').trim();
-    if (!query) return '';
-    if (from === to) return query;
-
-    // Відкрите безкоштовне REST API перекладу (MyMemory Translation API)
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(query)}&langpair=${from}|${to}`;
-
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Помилка сервера: HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.responseStatus !== 200 && data.responseStatus !== '200') {
-      throw new Error(data.responseDetails || 'Помилка виконання перекладу');
-    }
-
-    return data.responseData.translatedText;
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
   }
 
-
-  // ── 3. ВИКОНАННЯ ТА ВІДОБРАЖЕННЯ ПЕРЕКЛАДУ ──────────────────────────────
-  async function performTranslation() {
-    const text = srcText.value.trim();
-    const from = srcLang.value;
-    const to   = tgtLang.value;
-
-    if (!text) {
-      tgtText.value = '';
-      setStatus('normal', 'Введіть текст для перекладу');
-      return;
-    }
-
-    // Індикація завантаження
-    setStatus('loading', 'Виконується переклад...');
-    btnTrans.disabled = true;
-
-    try {
-      const result = await fetchTranslation(text, from, to);
-      tgtText.value = result;
-      setStatus('success', 'Переклад успішно отримано');
-    } catch (err) {
-      console.error(err);
-      setStatus('error', `Помилка: ${err.message}`);
-    } finally {
-      btnTrans.disabled = false;
-    }
+  const data = await response.json();
+  if (Number(data.responseStatus) !== 200) {
+    throw new Error(data.responseDetails || 'Помилка сервісу перекладу');
   }
 
-  function setStatus(type, message) {
-    statusBox.className = 'status-box';
-    if (type !== 'normal') {
-      statusBox.classList.add(type);
-    }
-    statusBox.textContent = message;
+  return data.responseData.translatedText;
+}
+
+async function handleTranslate(isManual) {
+  const text = sourceText.value.trim();
+  const from = sourceLang.value;
+  const to = targetLang.value;
+
+  if (!text) {
+    return {
+      text: '',
+      status: isManual ? 'Введіть текст для перекладу' : '',
+      isError: isManual,
+    };
   }
 
+  if (from === to) {
+    return { text, status: '', isError: false };
+  }
 
-  // ── 4. ОБРОБКА ПОДІЙ ЧЕРЕЗ RXJS (МЕТОДИЧКА: КРОК 2 ТА ДОД. ЗАВДАННЯ) ─────
-  const { fromEvent } = rxjs;
-  const { debounceTime, distinctUntilChanged } = rxjs.operators;
+  statusEl.textContent = 'Переклад...';
+  statusEl.className = '';
 
-  // А) Додаткове завдання: автопереклад під час набору (debounce 500 мс)
-  fromEvent(srcText, 'input')
-    .pipe(
-      debounceTime(500),
-      distinctUntilChanged()
-    )
-    .subscribe(() => {
-      if (chkAuto.checked) {
-        performTranslation();
-      }
-    });
+  try {
+    const translated = await translate(text, from, to);
+    return { text: translated, status: '', isError: false };
+  } catch (err) {
+    return { text: null, status: `Помилка: ${err.message}`, isError: true };
+  }
+}
 
-  // Б) Ручний переклад при кліку на кнопку «Перекласти»
-  fromEvent(btnTrans, 'click').subscribe(() => {
-    performTranslation();
-  });
+const input$ = fromEvent(sourceText, 'input').pipe(
+  debounceTime(500),
+  map(() => false)
+);
 
-  // В) Додаткове завдання: кнопка «Поміняти мови місцями» з повторним перекладом
-  fromEvent(btnSwap, 'click').subscribe(() => {
-    const temp = srcLang.value;
-    srcLang.value = tgtLang.value;
-    tgtLang.value = temp;
+const click$ = fromEvent(translateBtn, 'click').pipe(
+  map(() => true)
+);
 
-    // Якщо в результаті вже був текст — міняємо його з вхідним
-    if (tgtText.value.trim()) {
-      srcText.value = tgtText.value;
-      tgtText.value = '';
+const langChange$ = merge(
+  fromEvent(sourceLang, 'change'),
+  fromEvent(targetLang, 'change')
+).pipe(map(() => false));
+
+const swap$ = fromEvent(swapBtn, 'click').pipe(
+  map(() => {
+    [sourceLang.value, targetLang.value] = [targetLang.value, sourceLang.value];
+    if (targetText.value.trim()) {
+      sourceText.value = targetText.value;
+      targetText.value = '';
     }
+    return false;
+  })
+);
 
-    performTranslation();
+merge(input$, click$, langChange$, swap$)
+  .pipe(switchMap((isManual) => handleTranslate(isManual)))
+  .subscribe(({ text, status, isError }) => {
+    if (text !== null) {
+      targetText.value = text;
+    }
+    statusEl.textContent = status;
+    statusEl.className = isError ? 'error' : '';
   });
-
-  // Г) Повторний переклад при зміні мови у списках
-  fromEvent(srcLang, 'change').subscribe(() => {
-    if (srcText.value.trim()) performTranslation();
-  });
-  fromEvent(tgtLang, 'change').subscribe(() => {
-    if (srcText.value.trim()) performTranslation();
-  });
-
-
-  // ── 5. ПОЧАТКОВИЙ СТАН ──────────────────────────────────────────────────
-  srcText.value = '';
-  tgtText.value = '';
-  srcText.focus();
-
-});
